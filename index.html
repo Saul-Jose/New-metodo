@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Completa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 700px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        h1, h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .input-group {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        input[type="text"], input[type="number"], input[type="radio"] {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+        }
+        
+        input[type="text"]:focus, input[type="number"]:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        .divisor-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .divisor-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .divisor-option:hover {
+            background: #f8f9fa;
+        }
+
+        .divisor-option.selected {
+            border-color: #4CAF50;
+            background: #e8f5e8;
+        }
+
+        .divisor-option input[type="radio"] {
+            margin: 0;
+            padding: 0;
+            width: auto;
+        }
+
+        .divisor-custom {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .decimal-limitador {
+            display: grid;
+            grid-template-columns: 1fr 120px;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .limitador-input {
+            width: 100% !important;
+        }
+
+        .auto-add-note {
+            background-color: #fff3e0;
+            color: #e65100;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 14px;
+            border-left: 4px solid #ff9800;
+        }
+
+        .decimal-display {
+            font-family: monospace;
+            font-size: 18px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            border: 2px solid #ddd;
+            word-break: break-all;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            line-height: 1.6;
+            margin: 10px 0;
+            /* Prevenir overflow horizontal */
+            overflow-x: auto;
+            white-space: pre-wrap;
+            max-width: 100%;
+        }
+
+        .highlighted-digit {
+            color: white;
+            font-weight: bold;
+            padding: 2px 4px;
+            border-radius: 3px;
+            margin: 0 1px;
+        }
+
+        .highlight-1 { background-color: #ff5722; }
+        .highlight-2 { background-color: #3f51b5; }
+        .highlight-3 { background-color: #4caf50; }
+        .highlight-4 { background-color: #9c27b0; }
+
+        .position-searchers {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 2px solid #e0e0e0;
+        }
+
+        .searcher-item {
+            text-align: center;
+        }
+
+        .searcher-item label {
+            font-size: 14px;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .searcher-item input {
+            width: 100%;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .searcher-1 { border-color: #ff5722; }
+        .searcher-1 label { color: #ff5722; }
+
+        .searcher-2 { border-color: #3f51b5; }
+        .searcher-2 label { color: #3f51b5; }
+
+        .searcher-3 { border-color: #4caf50; }
+        .searcher-3 label { color: #4caf50; }
+
+        .searcher-4 { border-color: #9c27b0; }
+        .searcher-4 label { color: #9c27b0; }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        button:hover {
+            background-color: #45a049;
+        }
+        
+        .result {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .calculation {
+            font-family: monospace;
+            font-size: 18px;
+            margin: 10px 0;
+            color: #333;
+            /* Prevenir overflow en cálculos largos */
+            word-break: break-all;
+            overflow-wrap: break-word;
+        }
+        
+        .nf {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .nr {
+            background-color: #e3f2fd;
+            color: #1565c0;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #2196F3;
+        }
+        
+        .error {
+            color: #f44336;
+            font-weight: bold;
+        }
+        
+        .parte {
+            border: 3px solid #ddd;
+            border-radius: 10px;
+        }
+        
+        .parte1 {
+            border-color: #4CAF50;
+        }
+        
+        .parte2 {
+            border-color: #2196F3;
+        }
+        
+        .hidden {
+            display: none;
+        }
+
+        /* Media queries para dispositivos pequeños */
+        @media (max-width: 600px) {
+            body {
+                margin: 20px auto;
+                padding: 10px;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            .decimal-limitador {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .position-searchers {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+                padding: 15px;
+            }
+            
+            .decimal-display {
+                font-size: 14px;
+                padding: 10px;
+                /* Asegurar que no se salga en móviles */
+                word-break: break-all;
+                overflow-x: auto;
+                max-width: calc(100vw - 80px);
+            }
+            
+            .calculation {
+                font-size: 14px;
+            }
+        }
+
+        /* Estilos adicionales para evitar overflow */
+        * {
+            box-sizing: border-box;
+        }
+        
+        .container * {
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- PARTE 1: Calculadora Simple -->
+    <div class="container parte parte1" id="parte1">
+        <h1>PARTE 1 - Calculadora Simple</h1>
+        
+        <div class="input-group">
+            <label for="numeros">Números a sumar (ejemplo: 1+2+3):</label>
+            <input type="text" id="numeros" placeholder="1+2+3">
+            <div class="auto-add-note">
+                <strong>Nota:</strong> Automáticamente se agregará +25 a tu suma
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <label>Seleccionar divisor:</label>
+            <div class="divisor-options">
+                <div class="divisor-option selected" onclick="selectDivisor(this, 1220)">
+                    <input type="radio" name="divisor" value="1220" checked>
+                    <span>Usar divisor 1220</span>
+                </div>
+                <div class="divisor-option" onclick="selectDivisor(this, 'custom')">
+                    <div class="divisor-custom">
+                        <input type="radio" name="divisor" value="custom">
+                        <input type="number" id="customDivisor" placeholder="Ingresa tu divisor personalizado" min="1">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label>Limitador de decimal y decimal generado:</label>
+            <div class="decimal-limitador">
+                <input type="text" id="decimalGenerado" placeholder="Se generará automáticamente..." readonly style="background: #f8f9fa;">
+                <input type="number" id="limitadorDecimal" placeholder="10" value="10" min="1" max="150" class="limitador-input">
+            </div>
+            <small style="color: #666; margin-top: 5px; display: block;">El número de la derecha limita cuántos dígitos decimales mostrar (1-150)</small>
+        </div>
+        
+        <button onclick="calcularParte1()">Calcular y Continuar a Parte 2</button>
+        
+        <div id="resultado1" class="result" style="display: none;">
+            <h3>Resultado Parte 1:</h3>
+            <div id="calculo1" class="calculation"></div>
+            <div id="division1" class="calculation"></div>
+            
+            <div class="input-group">
+                <label>Decimal con resaltado por posición:</label>
+                <div id="decimalDisplay" class="decimal-display"></div>
+                
+                <div class="position-searchers">
+                    <div class="searcher-item">
+                        <label>Posición 1:</label>
+                        <input type="number" id="pos1" class="searcher-1" min="1" placeholder="Pos" onchange="highlightPositions()">
+                    </div>
+                    <div class="searcher-item">
+                        <label>Posición 2:</label>
+                        <input type="number" id="pos2" class="searcher-2" min="1" placeholder="Pos" onchange="highlightPositions()">
+                    </div>
+                    <div class="searcher-item">
+                        <label>Posición 3:</label>
+                        <input type="number" id="pos3" class="searcher-3" min="1" placeholder="Pos" onchange="highlightPositions()">
+                    </div>
+                    <div class="searcher-item">
+                        <label>Posición 4:</label>
+                        <input type="number" id="pos4" class="searcher-4" min="1" placeholder="Pos" onchange="highlightPositions()">
+                    </div>
+                </div>
+                <small style="color: #666; margin-top: 10px; display: block;">
+                    Ingresa números de posición para resaltar dígitos específicos en el decimal. Posición 1 = "0", Posición 2 = primer dígito después del punto, etc.
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <!-- PARTE 2: Suma de Dígitos -->
+    <div class="container parte parte2 hidden" id="parte2">
+        <h2>PARTE 2 - Suma de Dígitos</h2>
+        
+        <div class="input-group">
+            <label for="fecha">Fecha (DD/MM/YYYY):</label>
+            <input type="text" id="fecha" placeholder="Ejemplo: 07/01/2025">
+        </div>
+        
+        <div class="input-group">
+            <label for="decimal">Número decimal:</label>
+            <input type="text" id="decimal" placeholder="Se completará automáticamente" readonly style="background: #f8f9fa;">
+        </div>
+        
+        <button onclick="calcularParte2()">Calcular Suma de Dígitos</button>
+        
+        <div id="resultado2" class="result" style="display: none;">
+            <h3>Resultados:</h3>
+            <div id="calculoFecha" class="calculation"></div>
+            <div id="calculoDecimal" class="calculation"></div>
+            
+            <div class="nf" id="nfResult">
+                <strong>NF:</strong> <span id="nfValue"></span> → <span id="nfSimplificados" style="font-weight: bold;"></span>
+            </div>
+            
+            <div class="nr" id="nrResult">
+                <strong>NR:</strong> <span id="nrValue"></span> → <span id="nrSimplificados" style="font-weight: bold;"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let divisorActual = 1220;
+        let decimalActual = '';
+
+        function selectDivisor(element, divisor) {
+            // Remover selección previa
+            document.querySelectorAll('.divisor-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Seleccionar la opción actual
+            element.classList.add('selected');
+            
+            if (divisor === 'custom') {
+                const customInput = document.getElementById('customDivisor');
+                customInput.focus();
+                customInput.addEventListener('input', function() {
+                    divisorActual = parseInt(this.value) || 1220;
+                    if (document.getElementById('numeros').value.trim()) {
+                        calcularParte1();
+                    }
+                });
+                divisorActual = parseInt(customInput.value) || 1220;
+            } else {
+                divisorActual = divisor;
+            }
+            
+            // Recalcular si ya hay números ingresados
+            if (document.getElementById('numeros').value.trim()) {
+                calcularParte1();
+            }
+        }
+
+        function calcularDivisionPrecisa(dividendo, divisor, cifrasDeseadas) {
+            // Realizar división usando algoritmo de división larga para mayor precisión
+            let parteEntera = Math.floor(dividendo / divisor);
+            let resto = dividendo - (parteEntera * divisor);
+            
+            // Calcular decimales usando división larga
+            let decimales = '';
+            let visitados = new Map(); // Para detectar repeticiones
+            
+            for (let i = 0; i < cifrasDeseadas && resto !== 0; i++) {
+                resto *= 10;
+                
+                // Verificar si ya hemos visto este resto (decimal periódico)
+                if (visitados.has(resto)) {
+                    break;
+                }
+                visitados.set(resto, i);
+                
+                let digito = Math.floor(resto / divisor);
+                decimales += digito;
+                resto = resto - (digito * divisor);
+            }
+            
+            // Si no hay decimales, usar '0'
+            if (decimales === '') {
+                decimales = '0';
+            }
+            
+            // Rellenar con ceros si no hay suficientes cifras
+            while (decimales.length < cifrasDeseadas) {
+                decimales += '0';
+            }
+            
+            return parteEntera + '.' + decimales;
+        }
+
+        function highlightPositions() {
+            if (!decimalActual) return;
+            
+            const pos1 = parseInt(document.getElementById('pos1').value);
+            const pos2 = parseInt(document.getElementById('pos2').value);
+            const pos3 = parseInt(document.getElementById('pos3').value);
+            const pos4 = parseInt(document.getElementById('pos4').value);
+            
+            let resultado = '';
+            const decimal = decimalActual.toString();
+            
+            // Recorrer cada carácter del decimal completo (incluyendo el punto)
+            for (let i = 0; i < decimal.length; i++) {
+                const char = decimal[i];
+                
+                // Si es el punto decimal, simplemente agregarlo sin resaltar
+                if (char === '.') {
+                    resultado += char;
+                    continue;
+                }
+                
+                // Calcular la posición según tu sistema:
+                // Posición 1 = el "0" antes del punto
+                // Posición 2 = primer dígito después del punto
+                // etc.
+                let posicion;
+                if (i === 0) {
+                    posicion = 1; // El "0" antes del punto es posición 1
+                } else {
+                    posicion = i; // Los dígitos después del punto mantienen su índice como posición
+                }
+                
+                let claseResaltado = '';
+                if (posicion === pos1) claseResaltado = 'highlight-1';
+                else if (posicion === pos2) claseResaltado = 'highlight-2';
+                else if (posicion === pos3) claseResaltado = 'highlight-3';
+                else if (posicion === pos4) claseResaltado = 'highlight-4';
+                
+                if (claseResaltado) {
+                    resultado += `<span class="highlighted-digit ${claseResaltado}">${char}</span>`;
+                } else {
+                    resultado += char;
+                }
+            }
+            
+            document.getElementById('decimalDisplay').innerHTML = resultado;
+        }
+
+        function calcularParte1() {
+            const numeros = document.getElementById('numeros').value;
+            const resultado1 = document.getElementById('resultado1');
+            const calculo1 = document.getElementById('calculo1');
+            const division1 = document.getElementById('division1');
+            const decimalGenerado = document.getElementById('decimalGenerado');
+
+            try {
+                // Extraer números de la expresión
+                const nums = numeros.match(/\d+/g);
+                if (!nums || nums.length === 0) {
+                    throw new Error('Debes ingresar números válidos');
+                }
+
+                let suma = 0;
+                let operacion = '';
+                
+                // Sumar los números ingresados
+                for (let i = 0; i < nums.length; i++) {
+                    suma += parseInt(nums[i]);
+                    operacion += nums[i];
+                    if (i < nums.length - 1) operacion += ' + ';
+                }
+
+                // Agregar automáticamente +25
+                suma += 25;
+                operacion += ' + 25';
+
+                calculo1.innerHTML = `<strong>Suma:</strong> ${operacion} = ${suma}`;
+
+                // Obtener el limitador de decimales
+                const limitador = parseInt(document.getElementById('limitadorDecimal').value) || 10;
+                
+                // Realizar división usando algoritmo de división larga para mayor precisión
+                const decimal = calcularDivisionPrecisa(suma, divisorActual, limitador);
+                
+                division1.innerHTML = `<strong>División:</strong> ${suma} ÷ ${divisorActual} = ${decimal}`;
+                decimalGenerado.value = decimal;
+                decimalActual = decimal;
+
+                // Mostrar el decimal en el display
+                document.getElementById('decimalDisplay').textContent = decimal;
+                highlightPositions();
+
+                // Automáticamente colocar el decimal en la parte 2
+                document.getElementById('decimal').value = decimal;
+
+                resultado1.style.display = 'block';
+
+                // Mostrar parte 2
+                document.getElementById('parte2').classList.remove('hidden');
+
+                // Calcular automáticamente la parte 2
+                setTimeout(() => {
+                    calcularParte2();
+                }, 500);
+
+            } catch (error) {
+                calculo1.innerHTML = `<span class="error">Error: ${error.message}</span>`;
+                division1.innerHTML = '';
+                decimalGenerado.value = '';
+                resultado1.style.display = 'block';
+            }
+        }
+
+        function calcularParte2() {
+            const fecha = document.getElementById('fecha').value;
+            const decimal = document.getElementById('decimal').value;
+            const resultado2 = document.getElementById('resultado2');
+            const calculoFecha = document.getElementById('calculoFecha');
+            const calculoDecimal = document.getElementById('calculoDecimal');
+
+            try {
+                // Procesar la fecha
+                let digitosFecha = fecha.replace(/[^0-9]/g, '');
+                if (digitosFecha.length === 0) {
+                    throw new Error('La fecha debe contener números');
+                }
+
+                const sumaFecha = sumarDigitos(digitosFecha);
+                const operacionFecha = digitosFecha.split('').join(' + ');
+
+                calculoFecha.innerHTML = `<strong>Fecha:</strong> ${operacionFecha} = ${sumaFecha}`;
+
+                // Procesar el decimal
+                const digitosDecimal = decimal.replace(/[^0-9]/g, '');
+                if (digitosDecimal.length === 0) {
+                    throw new Error('El decimal debe contener números');
+                }
+
+                const sumaDecimal = sumarDigitos(digitosDecimal);
+                const operacionDecimal = digitosDecimal.split('').join(' + ');
+                calculoDecimal.innerHTML = `<strong>Decimal:</strong> ${operacionDecimal} = ${sumaDecimal}`;
+
+                // Mostrar NF y NR con simplificación completa
+                document.getElementById('nfValue').textContent = sumaFecha;
+                document.getElementById('nrValue').textContent = sumaDecimal;
+
+                // Obtener todos los pasos de simplificación
+                const pasos_nf = obtenerPasosSimplificacion(sumaFecha);
+                const pasos_nr = obtenerPasosSimplificacion(sumaDecimal);
+                
+                document.getElementById('nfSimplificados').textContent = pasos_nf.pasos_texto;
+                document.getElementById('nrSimplificados').textContent = pasos_nr.pasos_texto;
+
+                resultado2.style.display = 'block';
+
+            } catch (error) {
+                calculoFecha.innerHTML = `<span class="error">Error: ${error.message}</span>`;
+                resultado2.style.display = 'block';
+            }
+        }
+
+        function sumarDigitos(numeroString) {
+            let suma = 0;
+            for (let i = 0; i < numeroString.length; i++) {
+                suma += parseInt(numeroString[i]);
+            }
+            return suma;
+        }
+
+        function obtenerPasosSimplificacion(numero) {
+            let actual = numero;
+            let pasos = [];
+            let detalle_pasos = [];
+            
+            while (actual >= 10) {
+                let digitos = actual.toString().split('');
+                let operacion = digitos.join(' + ');
+                let suma = 0;
+                for (let i = 0; i < digitos.length; i++) {
+                    suma += parseInt(digitos[i]);
+                }
+                pasos.push(suma);
+                detalle_pasos.push(`${actual} → ${operacion} = ${suma}`);
+                actual = suma;
+            }
+            
+            return {
+                valor_final: actual,
+                pasos: pasos,
+                pasos_texto: pasos.length > 0 ? pasos.join(' → ') : actual.toString(),
+                detalle_completo: detalle_pasos.length > 0 ? detalle_pasos.join(' → ') : `Ya es ${actual}`
+            };
+        }
+
+        // Auto-calcular parte 2 cuando se cambie el contenido
+        document.getElementById('fecha').addEventListener('input', calcularParte2);
+        
+        // Auto-calcular parte 1 cuando se cambie el limitador
+        document.getElementById('limitadorDecimal').addEventListener('input', () => {
+            if (document.getElementById('numeros').value.trim()) {
+                calcularParte1();
+            }
+        });
+
+        // Auto-calcular parte 1 cuando se cambien los números
+        document.getElementById('numeros').addEventListener('input', () => {
+            calcularParte1();
+        });
+    </script>
+</body>
+</html>
